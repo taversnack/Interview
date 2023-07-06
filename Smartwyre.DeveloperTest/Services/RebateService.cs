@@ -27,7 +27,7 @@ public class RebateService : IRebateService
 
         try
         {
-            var rebateAmount = calculateRebateAmountByIncentive(request);
+            var rebateAmount = CalculateRebateAmountByIncentive(request);
             _result.Success = true;
             _rebateDataStore.StoreCalculationResult(_rebate, rebateAmount);
         }
@@ -40,7 +40,7 @@ public class RebateService : IRebateService
     }
 
     // expressionValues is the array of values which are used to calcuate rebateAmount
-    private void validateRebate(SupportedIncentiveType supportedIncentiveType, decimal[] expressionValues)
+    private void ValidateRebate(SupportedIncentiveType supportedIncentiveType, decimal[] expressionValues)
     {
         string exeptionMessage = "";
         if (_product == null)
@@ -59,27 +59,27 @@ public class RebateService : IRebateService
         if (!string.IsNullOrEmpty(exeptionMessage)) throw new Exception(exeptionMessage);
     }
 
-    private decimal calculateRebateAmountByIncentive(CalculateRebateRequest request)
+    private decimal CalculateRebateAmountByIncentive(CalculateRebateRequest request)
     {
         switch (_rebate.Incentive)
         {
 
             case IncentiveType.FixedCashAmount:
-                validateRebate(
+                ValidateRebate(
                     SupportedIncentiveType.FixedCashAmount,
                     new[] { _rebate.Amount }
                 );
                 return (_rebate.Amount);
 
             case IncentiveType.FixedRateRebate:
-                validateRebate(
+                ValidateRebate(
                     SupportedIncentiveType.FixedRateRebate,
                     new[] { _product.Price, _rebate.Percentage, request.Volume }
                 );
                 return (_product.Price * _rebate.Percentage * request.Volume);
 
             case IncentiveType.AmountPerUom:
-                validateRebate(
+                ValidateRebate(
                     SupportedIncentiveType.AmountPerUom,
                     new[] { _rebate.Amount, request.Volume }
                 );
